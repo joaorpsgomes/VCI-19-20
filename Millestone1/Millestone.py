@@ -12,7 +12,7 @@ def resize(image,scl):
     return image_resized
 
 def estimateFrameRate(num_frame=30):
-	cap = cv2.VideoCapture(0);
+	cap = cv2.VideoCapture(0)
 	
 	start =time.time()
 
@@ -177,8 +177,8 @@ def intensitynormalization():
 
 def SaveVideo():
 	cap = cv2.VideoCapture(0)
-	fourcc = cv2.VideoWriter_fourcc(*'MJPG')  
-	#fourcc = cv2.VideoWriter_fourcc(*'H264')        
+	#fourcc = cv2.VideoWriter_fourcc(*'MJPG')  
+	fourcc = cv2.VideoWriter_fourcc(*'H264')        
 	frames_per_second=20
 
 	out = cv2.VideoWriter('output1.mp4', fourcc, frames_per_second, (640,  480))
