@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 import time
-from matplotlib import pyplot as pltq
+#from matplotlib import pyplot as pltq
 import argparse
 
 def resize(image,scl):
@@ -12,7 +12,7 @@ def resize(image,scl):
     return image_resized
 
 def estimateFrameRate(num_frame=30):
-	cap = cv2.VideoCapture(0);
+	cap = cv2.VideoCapture(0)
 	
 	start =time.time()
 
