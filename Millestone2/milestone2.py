@@ -61,15 +61,11 @@ def histogram_equalization():
 		cv2.imshow('original',img)
 		cv2.imshow('Equalization',equalization)
 
-		
-		cv2.imshow('ole',conc)
-
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
 		cv2.imwrite('dog_normalized.jpg',equalization)
 	
 	cv2.destroyAllWindows()
-
 
 def histogram_calculation(colorspace):
 		
@@ -93,9 +89,6 @@ def histogram_calculation(colorspace):
 				frame=frame
 				#cv2.imshow('yuv',frame)
 
-
-
-			
 			brg_planes=cv2.split(frame) # Separate the source image in its three R,G and B planes.
 			histsize=256
 			histrange=(0,256)       # the upper boundary is exclusive
@@ -109,6 +102,8 @@ def histogram_calculation(colorspace):
 			hist_h = 400
 			bin_w = int(round( hist_w/histsize ))
 			histImage = np.zeros((hist_h, hist_w, 3), dtype=np.uint8)
+			histImage2 = np.zeros((hist_h, hist_w, 3), dtype=np.uint8)
+			histImage3 = np.zeros((hist_h, hist_w, 3), dtype=np.uint8)
 
 			cv2.normalize(b_hist, b_hist, alpha=0, beta=hist_h, norm_type=cv2.NORM_MINMAX)
 			cv2.normalize(g_hist, g_hist, alpha=0, beta=hist_h, norm_type=cv2.NORM_MINMAX)
@@ -119,17 +114,28 @@ def histogram_calculation(colorspace):
 					( bin_w*(i), hist_h - int(np.round(b_hist[i])) ),
 					( 255, 0, 0), thickness=2)
 
-				cv2.line(histImage, ( bin_w*(i-1), hist_h - int(np.round(g_hist[i-1])) ),
+				cv2.line(histImage2, ( bin_w*(i-1), hist_h - int(np.round(g_hist[i-1])) ),
 					( bin_w*(i), hist_h - int(np.round(g_hist[i])) ),
 					( 0, 255, 0), thickness=2)
 
-				cv2.line(histImage, ( bin_w*(i-1), hist_h - int(np.round(r_hist[i-1])) ),
+				cv2.line(histImage3, ( bin_w*(i-1), hist_h - int(np.round(r_hist[i-1])) ),
 					( bin_w*(i), hist_h - int(np.round(r_hist[i])) ),
 					( 0, 0, 255), thickness=2)
 
-			cv2.imshow('real-time video',frame)
-			cv2.imshow('Histograma',histImage)
 
+			cv2.imshow('real-time video',frame)
+			if colorspace=='rgb':
+				cv2.imshow('Blue',histImage)
+				cv2.imshow('Green',histImage2)
+				cv2.imshow('Red', histImage3)
+			elif colorspace=='yuv':
+				cv2.imshow('Luma',histImage3)
+				cv2.imshow('Blue-Luma',histImage2)
+				cv2.imshow('Red-luma',histImage)
+			elif colorspace=='hsv':
+				cv2.imshow('Brightness - (0..100)',histImage)
+				cv2.imshow('Saturation - (0..100)',histImage2)
+				cv2.imshow('Hue - (0..360)',histImage3)	
 			if cv2.waitKey(20) & 0xFF == ord('q'):
 				break
 			
@@ -181,9 +187,10 @@ parser.add_argument("-e","--HistoEqual", help="show the histogram equalization",
                     action="store_true")
 parser.add_argument("-b","--BlurImages", help="Apply gaussian and blur filters to the acquired images",
                     action="store_true")
-parser.add_argument("-c","--HistoCalc", help="show the histogram in real time (rbg,hsv,yuv)",default='rgb')
+parser.add_argument("-c","--HistoCalc", help="show the histogram in real time (rbg,hsv,yuv)")
                    
-parser.add_argument("-a","--ChangeColor", help="Change the color spaces", default='hsv')
+parser.add_argument("-a","--ChangeColor", help="Change the color spaces")
+
                     
 
 args = parser.parse_args()
