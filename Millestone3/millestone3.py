@@ -197,7 +197,30 @@ def tracking_realtime():
 
         if(cv2.waitKey(1) & 0xFF == ord('q')):
             break
+        
+        return frame
 
+
+def tracking_realtime_gray():
+
+    kernel = np.ones((1,1),np.uint8)
+    
+
+    while(True):
+        frame=tracking_realtime()
+        #img=cv2.imread('img_test.png',1)
+        #img=resize(img,60)
+
+        gray= cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
+
+        opening = cv2.morphologyEx(gray, cv2.MORPH_OPEN, kernel)
+        closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel)
+
+        cv2.imwrite('filtred.jpg',closing)
+        cv2.imshow('filtred',closing)
+
+        if(cv2.waitKey(1) & 0xFF == ord('q')):
+            break
 
 
 """
@@ -208,10 +231,9 @@ tracking_ball()
 tracking_blue_team()
 tracking_orange_team()
 tracking_lines()
-"""
 tracking_realtime()
-
-
+"""
+tracking_realtime_gray()
 
 
 
