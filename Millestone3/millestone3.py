@@ -14,6 +14,38 @@ def resize(image,scl):
 def nothing(x):
     print(x)
 
+def setMouseCallback():
+    window_name = 'Detect_mouse'
+
+    img = np.zeros((512,512,3), np.uint8)
+
+    cv2.namedWindow(window_name)
+
+
+    def events(event, x,y,flags, params):
+        if event == cv2.EVENT_LBUTTONDBLCLK:
+            print('Left double click \n')
+        elif event==cv2.EVENT_MOUSEMOVE and flags==cv2.EVENT_FLAG_CTRLKEY:
+            print('Mouse move \n') 
+        elif event==cv2.EVENT_LBUTTONDOWN:
+            print('Left click \n') 
+        elif event==cv2.EVENT_RBUTTONDOWN:
+            print('Rigth click \n')
+        elif event==cv2.EVENT_MBUTTONDOWN:
+            print('Middle click\n')
+        elif x==100 and y==100:
+            print('X=100 and Y==100\n')
+
+
+    cv2.setMouseCallback(window_name, events)
+
+
+    while(True):
+        cv2.imshow(window_name, img)
+        if(cv2.waitKey(1) & 0xFF == ord('q')):
+                break
+
+
 def init_trackbar():
     cv2.namedWindow('image')
     ilowH = 0
@@ -141,8 +173,6 @@ def tracking_lines():
             break
 
 def tracking_realtime():
-    #init_trackbar()
-    #trackbar_realtime()
     cap = cv2.VideoCapture('cambada_video.mp4')
     cv2.namedWindow('image')
 
@@ -224,7 +254,7 @@ def tracking_realtime_gray():
             break
 
 
-"""
+'''
 init_trackbar()
 trackbar_realtime()
 
@@ -232,8 +262,10 @@ tracking_ball()
 tracking_blue_team()
 tracking_orange_team()
 tracking_lines()
-"""
+
 tracking_realtime()
+'''
+setMouseCallback()
 
 #tracking_realtime_gray()
 
