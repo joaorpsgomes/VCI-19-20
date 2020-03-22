@@ -141,8 +141,8 @@ def tracking_lines():
             break
 
 def tracking_realtime():
-    init_trackbar()
-    trackbar_realtime()
+    #init_trackbar()
+    #trackbar_realtime()
     cap = cv2.VideoCapture('cambada_video.mp4')
     cv2.namedWindow('image')
 
@@ -175,7 +175,7 @@ def tracking_realtime():
         mask_lines = cv2.inRange(hsv, lower_hsv_lines, higher_hsv_lines)
         
         if s==1:
-            mask  = cv2.add(mask_orange,mask_blue,mask_ball,mask_lines)
+            mask = mask_ball+mask_blue+mask_lines+mask_orange
             frame = cv2.bitwise_or(frame, frame, mask=mask)
         elif s==2:   
             frame = cv2.bitwise_and(frame, frame, mask=mask_ball)
