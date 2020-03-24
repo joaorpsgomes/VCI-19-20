@@ -4,6 +4,10 @@ import numpy as np
 
 
 
+
+
+
+
 def resize(image,scl):
     w_image = int(image.shape[1] * scl / 100)
     h_image = int(image.shape[0] * scl / 100)
@@ -253,6 +257,104 @@ def tracking_realtime_gray():
         if(cv2.waitKey(1) & 0xFF == ord('q')):
             break
 
+########################################## Filtros #######################################
+
+def erosion(frame,iter):
+    kernel = np.ones((5,5),np.uint8)
+    erosion = cv2.erode(frame,kernel,iterations = iter)
+    return erosion
+
+def dilation(frame,iter):
+    kernel = np.ones((5,5),np.uint8)
+    dilation = cv2.dilate(frame,kernel,iterations = iter)
+    return dilation
+
+def opening(frame,iter):
+    frame=erosion(frame,iter)
+    frame=dilation(frame,iter)
+    return frame
+
+def closing(frame,iter):    
+    frame=dilation(frame,iter)
+    frame=erosion(frame,iter)
+    return frame
+
+
+
+
+def tracking_realtime_filtered():
+    cap = cv2.VideoCapture('cambada_video.mp4')
+    cv2.namedWindow('Original vs Filtered')
+
+    switch = '(1)tracking_ball  (2)tracking_blue_team (3)tracking_orange_team (4)tracking_lines'
+    cv2.createTrackbar(switch, 'Original vs Filtered', 1, 5, nothing)
+
+    while(True):
+        ret, frame = cap.read()
+        frame=resize(frame,30)
+
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+        s = cv2.getTrackbarPos(switch, 'Original vs Filtered')
+
+        #tracking_ball
+        lower_hsv_ball = np.array([22, 77, 88])
+        higher_hsv_ball = np.array([41, 254, 255])
+        mask_ball = cv2.inRange(hsv, lower_hsv_ball, higher_hsv_ball)
+        #tracking_blue_team()
+        lower_hsv_blue = np.array([88, 90, 46])
+        higher_hsv_blue = np.array([106, 255, 255])
+        mask_blue = cv2.inRange(hsv, lower_hsv_blue, higher_hsv_blue)
+        #tracking_orange_team()
+        lower_hsv_orange = np.array([0, 89, 0])
+        higher_hsv_orange = np.array([20, 255, 196])
+        mask_orange = cv2.inRange(hsv, lower_hsv_orange, higher_hsv_orange)
+        #tracking_lines()
+        lower_hsv_lines = np.array([0, 0, 162])
+        higher_hsv_lines = np.array([179, 49, 255])
+        mask_lines = cv2.inRange(hsv, lower_hsv_lines, higher_hsv_lines)
+        
+        if s==1:
+            mask  = mask_ball+mask_blue+mask_lines+mask_orange
+            frame_filtered = cv2.bitwise_or(frame, frame, mask=mask)
+            frame_filtered = cv2.cvtColor(frame_filtered, cv2.COLOR_BGR2GRAY)
+            frame_filtered = opening(frame_filtered,1)
+            frame_filtered = erosion(frame_filtered,1)
+
+        elif s==2:   
+            frame_filtered = cv2.bitwise_and(frame, frame, mask=mask_ball)
+            frame_filtered = cv2.cvtColor(frame_filtered, cv2.COLOR_BGR2GRAY)        
+            frame_filtered = opening(frame_filtered,1)
+
+        elif s==3:   
+            frame_filtered = cv2.bitwise_and(frame, frame, mask=mask_blue)
+            frame_filtered = cv2.cvtColor(frame_filtered, cv2.COLOR_BGR2GRAY)
+            frame_filtered = opening(frame_filtered,1)
+
+        elif s==4:
+            frame_filtered = cv2.bitwise_and(frame, frame, mask=mask_orange)
+            frame_filtered = cv2.cvtColor(frame_filtered, cv2.COLOR_BGR2GRAY)
+            frame_filtered = opening(frame_filtered,1)
+
+        elif s==5:
+            frame_filtered = cv2.bitwise_and(frame, frame, mask=mask_lines)
+            frame_filtered = cv2.cvtColor(frame_filtered, cv2.COLOR_BGR2GRAY)
+            frame_filtered = closing(frame_filtered,1)
+            frame_filtered = opening(frame_filtered,1)
+            frame_filtered = erosion(frame_filtered,1)
+
+        # show thresholded image
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        numpy_horizontal = np.hstack((frame, frame_filtered))
+        cv2.imshow('Original vs Filtered', numpy_horizontal)
+        #cv2.imshow('image', frame)
+
+
+        if(cv2.waitKey(1) & 0xFF == ord('q')):
+            break
+
+
+########################################## main #######################################
 
 '''
 init_trackbar()
@@ -265,11 +367,11 @@ tracking_lines()
 
 tracking_realtime()
 '''
-setMouseCallback()
+#setMouseCallback()
 
 #tracking_realtime_gray()
 
-
+tracking_realtime_filtered()
 
 
     
