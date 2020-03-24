@@ -1,11 +1,7 @@
 import cv2 
 import numpy as np
-
-
-
-
-
-
+from matplotlib import pyplot as plt
+import argparse
 
 
 def resize(image,scl):
@@ -71,8 +67,11 @@ def init_trackbar():
     cv2.createTrackbar('highV','image',ihighV,255,nothing)
 
 def trackbar_realtime():
+
+    init_trackbar()
+
     while(True):
-        img=cv2.imread('cambada_image.jpg',1) 
+        img=cv2.imread('cambada_image.png',1) 
         frame=resize(img,60)
         
         ilowH = cv2.getTrackbarPos('lowH', 'image')
@@ -177,10 +176,11 @@ def tracking_lines():
             break
 
 def tracking_realtime():
+
     cap = cv2.VideoCapture('cambada_video.mp4')
     cv2.namedWindow('image')
 
-    switch = '(1)tracking_ball  (2)tracking_blue_team (3)tracking_orange_team (4)tracking_lines'
+    switch = '(0) original_video (1)tracking_all  (2)tracking_ball (3)tracking_blue_team (4)tracking_orange_team (5)tracking_lines'
     cv2.createTrackbar(switch, 'image', 1, 5, nothing)
 
     while(True):
@@ -235,30 +235,6 @@ def tracking_realtime():
         
         #return frame
 
-
-def tracking_realtime_gray():
-
-    kernel = np.ones((1,1),np.uint8)
-    
-
-    while(True):
-        frame=tracking_realtime()
-        #img=cv2.imread('img_test.png',1)
-        #img=resize(img,60)
-
-        gray= cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
-
-        opening = cv2.morphologyEx(gray, cv2.MORPH_OPEN, kernel)
-        closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel)
-
-        cv2.imwrite('filtred.jpg',closing)
-        cv2.imshow('filtred',closing)
-
-        if(cv2.waitKey(1) & 0xFF == ord('q')):
-            break
-
-########################################## Filtros #######################################
-
 def erosion(frame,iter):
     kernel = np.ones((5,5),np.uint8)
     erosion = cv2.erode(frame,kernel,iterations = iter)
@@ -286,12 +262,12 @@ def tracking_realtime_filtered():
     cap = cv2.VideoCapture('cambada_video.mp4')
     cv2.namedWindow('Original vs Filtered')
 
-    switch = '(1)tracking_ball  (2)tracking_blue_team (3)tracking_orange_team (4)tracking_lines'
+    switch = '(1)tracking_all  (2)tracking_ball (3)tracking_blue_team (4)tracking_orange_team (5)tracking_lines'
     cv2.createTrackbar(switch, 'Original vs Filtered', 1, 5, nothing)
 
     while(True):
         ret, frame = cap.read()
-        frame=resize(frame,30)
+        frame=resize(frame,60)
 
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
@@ -353,26 +329,197 @@ def tracking_realtime_filtered():
         if(cv2.waitKey(1) & 0xFF == ord('q')):
             break
 
+#Image Segmentation with Distance Transform and Watershed Algorithm 
 
-########################################## main #######################################
+def simplest_thresholds():
 
-'''
-init_trackbar()
-trackbar_realtime()
+    img = cv2.imread('coins.jpg')
 
-tracking_ball()
-tracking_blue_team()
-tracking_orange_team()
-tracking_lines()
+    img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 
-tracking_realtime()
-'''
-#setMouseCallback()
+    ret,thresh1 = cv2.threshold(img,127,255,cv2.THRESH_BINARY)
+    ret,thresh2 = cv2.threshold(img,127,255,cv2.THRESH_BINARY_INV)
+    ret,thresh3 = cv2.threshold(img,127,255,cv2.THRESH_TRUNC)
+    ret,thresh4 = cv2.threshold(img,127,255,cv2.THRESH_TOZERO)
+    ret,thresh5 = cv2.threshold(img,127,255,cv2.THRESH_TOZERO_INV)
 
-#tracking_realtime_gray()
+    titles = ['Original Image','BINARY','BINARY_INV','TRUNC','TOZERO','TOZERO_INV']
+    images = [img, thresh1, thresh2, thresh3, thresh4, thresh5]
 
-tracking_realtime_filtered()
+    for i in range(6):
+        plt.subplot(2,3,i+1),plt.imshow(images[i],'gray')
+        plt.title(titles[i])
+        plt.xticks([]),plt.yticks([])
+
+    plt.show()
 
 
-    
+def seg_algorithms_img():
+
+    while(1):
+
+        img = cv2.imread('coins.jpg')
+
+        cv2.imshow('Original Image',img)
+
+        #We start with finding an approximate estimate of the coins. For that, we can use the Otsu's binarization. 
+
+        gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+        ret, thresh = cv2.threshold(gray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+
+        cv2.imshow('Image', thresh)
+
+        #To remove any small holes in the object, we can use morphological closing.
+
+        # noise removal
+        kernel = np.ones((3,3),np.uint8)
+        opening = cv2.morphologyEx(thresh,cv2.MORPH_OPEN,kernel, iterations = 2)
+
+        cv2.imshow('Image with noise removal', opening)
+        # sure background area
+        sure_bg = cv2.dilate(opening,kernel,iterations=3)
+        cv2.imshow('Sure Background area', sure_bg)
+        # Finding sure foreground area
+        #dist_transform = cv2.distanceTransform(opening,cv2.DIST_L2,5)
+        #ret, sure_fg = cv2.threshold(dist_transform,0.7*dist_transform.max(),255,0)
+        sure_fg = cv2.erode(opening,kernel,iterations=3)
+        cv2.imshow('Sure Foreground area', sure_fg)
+        # Finding unknown region
+        sure_fg = np.uint8(sure_fg)
+        unknown = cv2.subtract(sure_bg,sure_fg)
+        cv2.imshow('Unknown region', unknown)
+
+        # Marker labelling
+        ret, markers = cv2.connectedComponents(sure_fg)
+        # Add one to all labels so that sure background is not 0, but 1
+        markers = markers+1
+        # Now, mark the region of unknown with zero
+        markers[unknown==255] = 0
+
+        markers = cv2.watershed(img,markers)
+        img[markers == -1] = [255,0,0]
+
+        cv2.imshow('Result', img)
+
+        if(cv2.waitKey(1) & 0xFF == ord('q')):
+            break
+
+def region_growing():
+    def get8n(x, y, shape):
+        out = []
+        maxx = shape[1]-1
+        maxy = shape[0]-1
+
+        #top left
+        outx = min(max(x-1,0),maxx)
+        outy = min(max(y-1,0),maxy)
+        out.append((outx,outy))
+
+        #top center
+        outx = x
+        outy = min(max(y-1,0),maxy)
+        out.append((outx,outy))
+
+        #top right
+        outx = min(max(x+1,0),maxx)
+        outy = min(max(y-1,0),maxy)
+        out.append((outx,outy))
+
+        #left
+        outx = min(max(x-1,0),maxx)
+        outy = y
+        out.append((outx,outy))
+
+        #right
+        outx = min(max(x+1,0),maxx)
+        outy = y
+        out.append((outx,outy))
+
+        #bottom left
+        outx = min(max(x-1,0),maxx)
+        outy = min(max(y+1,0),maxy)
+        out.append((outx,outy))
+
+        #bottom center
+        outx = x
+        outy = min(max(y+1,0),maxy)
+        out.append((outx,outy))
+
+        #bottom right
+        outx = min(max(x+1,0),maxx)
+        outy = min(max(y+1,0),maxy)
+        out.append((outx,outy))
+
+        return out
+
+    def region_growing(img, seed):
+        list = []
+        outimg = np.zeros_like(img)
+        list.append((seed[0], seed[1]))
+        processed = []
+        while(len(list) > 0):
+            pix = list[0]
+            outimg[pix[0], pix[1]] = 255
+            for coord in get8n(pix[0], pix[1], img.shape):
+                if img[coord[0], coord[1]] != 0:
+                    outimg[coord[0], coord[1]] = 255
+                    if not coord in processed:
+                        list.append(coord)
+                    processed.append(coord)
+            list.pop(0)
+            #cv2.imseg_algorithms_img()tKey(1)
+        return outimg
+
+    def on_mouse(event, x, y, flags, params):
+        if event == cv2.EVENT_LBUTTONDOWN:
+            print( 'Seed: ' + str(x) + ', ' + str(y), img[y,x])
+            clicks.append((y,x))
+
+    clicks = []
+    image = cv2.imread('coins.jpg', 0)
+    ret, img = cv2.threshold(image, 128, 255, cv2.THRESH_BINARY)
+    cv2.namedWindow('Input')
+    cv2.setMouseCallback('Input', on_mouse, 0, )
+    cv2.imshow('Input', img)
+    cv2.waitKey()
+    seed = clicks[-1]
+    out = region_growing(img, seed)
+    cv2.imshow('Region Growing', out)
+    cv2.waitKey()
+
 cv2.destroyAllWindows()
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("-m","--MouseCallback", help="Test MouseCallBack",
+                    action="store_true")
+parser.add_argument("-t","--TrackbarRealTime", help="Trackbar in an image",
+                    action="store_true")
+parser.add_argument("-r","--TrackingRealTime", help="Tracks all game components in real time",
+                    action="store_true")
+parser.add_argument("-g","--TrackingRealTimeFiltered", help="Tracks all game components in real time in a grayscale",
+                    action="store_true")
+parser.add_argument("-s","--SimplestThresholds", help="Exploring the basic thresholds in an image",
+                    action="store_true")
+parser.add_argument("-a","--SegmentationAlgorithms", help="Exploring image Segmentation with Distance Transform(commented)/Erosion and Watershed Algorithm",
+                    action="store_true")
+parser.add_argument("-w","--RegionGrowing", help="Exploring Region Growing",
+                    action="store_true")                   
+
+args = parser.parse_args()
+
+
+if args.MouseCallback:
+	setMouseCallback()
+elif args.TrackbarRealTime:
+    trackbar_realtime()
+elif args.TrackingRealTime:
+    tracking_realtime()
+elif args.TrackingRealTimeFiltered:
+	tracking_realtime_filtered()
+elif args.SimplestThresholds:
+	simplest_thresholds()
+elif args.SegmentationAlgorithms:
+	seg_algorithms_img()
+elif args.RegionGrowing:
+	region_growing()
