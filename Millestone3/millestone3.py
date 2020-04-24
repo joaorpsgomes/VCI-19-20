@@ -330,7 +330,7 @@ def tracking_realtime_filtered():
             break
 
 #Image Segmentation with Distance Transform and Watershed Algorithm 
-
+'''
 def simplest_thresholds():
 
     img = cv2.imread('coins.jpg')
@@ -352,7 +352,79 @@ def simplest_thresholds():
         plt.xticks([]),plt.yticks([])
 
     plt.show()
+'''
 
+
+def simplest_thresholds():
+
+    cap = cv2.VideoCapture('cambada_video.mp4')
+    cv2.namedWindow('image')
+
+    switch = '(0) original_video (1)tracking_all_hsv_only  (2)THRESH_BINARY_INV (3)THRESH_TRUNC (4)THRESH_TOZERO (5)THRESH_TOZERO_INV'
+    cv2.createTrackbar(switch, 'image', 1, 5, nothing)
+
+    while(True):
+        ret, frame = cap.read()
+        frame=resize(frame,55)
+
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+        s = cv2.getTrackbarPos(switch, 'image')
+
+        #tracking_ball
+        lower_hsv_ball = np.array([22, 77, 88])
+        higher_hsv_ball = np.array([41, 254, 255])
+        mask_ball = cv2.inRange(hsv, lower_hsv_ball, higher_hsv_ball)
+        #tracking_blue_team()
+        lower_hsv_blue = np.array([88, 90, 46])
+        higher_hsv_blue = np.array([106, 255, 255])
+        mask_blue = cv2.inRange(hsv, lower_hsv_blue, higher_hsv_blue)
+        #tracking_orange_team()
+        lower_hsv_orange = np.array([0, 89, 0])
+        higher_hsv_orange = np.array([20, 255, 196])
+        mask_orange = cv2.inRange(hsv, lower_hsv_orange, higher_hsv_orange)
+        #tracking_lines()
+        lower_hsv_lines = np.array([0, 0, 162])
+        higher_hsv_lines = np.array([179, 49, 255])
+        mask_lines = cv2.inRange(hsv, lower_hsv_lines, higher_hsv_lines)
+        
+        if s==1:
+            mask = mask_ball+mask_blue+mask_lines+mask_orange
+            frame = cv2.bitwise_or(frame, frame, mask=mask)
+        elif s==2:   
+            mask = mask_ball+mask_blue+mask_lines+mask_orange
+            frame = cv2.bitwise_or(frame, frame, mask=mask)
+            frame = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
+            ret,frame = cv2.threshold(frame,127,255,cv2.THRESH_BINARY_INV)
+        elif s==3:   
+             mask = mask_ball+mask_blue+mask_lines+mask_orange
+             frame = cv2.bitwise_or(frame, frame, mask=mask)
+             frame = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
+             ret,frame = cv2.threshold(frame,127,255,cv2.THRESH_TRUNC)
+        elif s==4:
+             mask = mask_ball+mask_blue+mask_lines+mask_orange
+             frame = cv2.bitwise_or(frame, frame, mask=mask)
+             frame = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
+             ret,frame = cv2.threshold(frame,127,255,cv2.THRESH_TOZERO)
+        elif s==5:
+             mask = mask_ball+mask_blue+mask_lines+mask_orange
+             frame = cv2.bitwise_or(frame, frame, mask=mask)
+             frame = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
+             ret,frame = cv2.threshold(frame,127,255,cv2.THRESH_TOZERO_INV)
+        
+
+        #frame = cv2.bitwise_and(frame, frame, mask=mask_ball)
+        #frame = cv2.bitwise_and(frame, frame, mask=mask_blue)
+        #frame = cv2.bitwise_and(frame, frame, mask=mask_orange)
+        #frame = cv2.bitwise_and(frame, frame, mask=mask_lines)
+
+        # show thresholded image
+        cv2.imshow('image', frame)
+
+
+        if(cv2.waitKey(1) & 0xFF == ord('q')):
+            break
+        
 
 def seg_algorithms_img():
 
