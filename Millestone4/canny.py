@@ -59,6 +59,53 @@ def limit_area_to_field(frame):
 
 def tracking_realtime_img_grad():
     cap = cv2.VideoCapture('cambada_video.mp4')
+
+    while(True):
+        ret, frame = cap.read()
+        frame=resize(frame,50)
+
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+        #tracking_ball
+        lower_hsv_ball = np.array([22, 114, 88])
+        higher_hsv_ball = np.array([41, 254, 255])
+        mask_ball = cv2.inRange(hsv, lower_hsv_ball, higher_hsv_ball)
+        #tracking_blue_team()
+        lower_hsv_blue = np.array([91, 78, 46])
+        higher_hsv_blue = np.array([101, 255, 255])
+        mask_blue = cv2.inRange(hsv, lower_hsv_blue, higher_hsv_blue)
+        #tracking_orange_team()
+        lower_hsv_orange = np.array([0, 89, 0])
+        higher_hsv_orange = np.array([20, 255, 196])
+        mask_orange = cv2.inRange(hsv, lower_hsv_orange, higher_hsv_orange)
+        #tracking_lines()
+        lower_hsv_lines = np.array([0, 0, 162])
+        higher_hsv_lines = np.array([179, 49, 255])
+        mask_lines = cv2.inRange(hsv, lower_hsv_lines, higher_hsv_lines)
+
+        frame = limit_area_to_field(frame)
+        
+        mask  = mask_ball+mask_blue+mask_lines+mask_orange
+        frame_filtered = cv2.bitwise_or(frame, frame, mask=mask)
+        frame_filtered = cv2.cvtColor(frame_filtered, cv2.COLOR_BGR2GRAY) 
+        sobelx = cv2.Sobel(frame_filtered,cv2.CV_64F,1,0,ksize=5)
+        sobely = cv2.Sobel(frame_filtered,cv2.CV_64F,0,1,ksize=5)
+        scharrx = cv2.Scharr(frame_filtered, cv2.CV_64F,1,0)
+        scharry = cv2.Scharr(frame_filtered, cv2.CV_64F,0,1)
+
+        cv2.imshow('Original', frame_filtered)
+        cv2.imshow('sobelx', sobelx)
+        cv2.imshow('sobely', sobely)
+        cv2.imshow('scharrx', scharrx)
+        cv2.imshow('scharry', scharry)
+        
+
+        if(cv2.waitKey(1) & 0xFF == ord('q')):
+            break
+
+
+def tracking_realtime_laplace():
+    cap = cv2.VideoCapture('cambada_video.mp4')
     cv2.namedWindow('Original vs Filtered')
 
     switch = '(1)tracking_all  (2)tracking_ball (3)tracking_blue_team (4)tracking_orange_team (5)tracking_lines'
@@ -66,9 +113,9 @@ def tracking_realtime_img_grad():
 
     while(True):
         ret, frame = cap.read()
-        frameori=resize(frame,45)
+        frame=resize(frame,75)
 
-        hsv = cv2.cvtColor(frameori, cv2.COLOR_BGR2HSV)
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
         s = cv2.getTrackbarPos(switch, 'Original vs Filtered')
 
@@ -89,7 +136,7 @@ def tracking_realtime_img_grad():
         higher_hsv_lines = np.array([179, 49, 255])
         mask_lines = cv2.inRange(hsv, lower_hsv_lines, higher_hsv_lines)
 
-        frame = limit_area_to_field(frameori)
+        frame = limit_area_to_field(frame)
         
         if s==1:
             mask  = mask_ball+mask_blue+mask_lines+mask_orange
@@ -123,8 +170,8 @@ def tracking_realtime_img_grad():
             frame_filtered = np.uint8(np.absolute(frame_filtered))   
 
         # show thresholded image
-        frameori = cv2.cvtColor(frameori, cv2.COLOR_BGR2GRAY)
-        numpy_horizontal = np.hstack((frameori, frame_filtered))
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        numpy_horizontal = np.hstack((frame, frame_filtered))
         cv2.imshow('Original vs Filtered', numpy_horizontal)
 
         if(cv2.waitKey(1) & 0xFF == ord('q')):
@@ -139,7 +186,7 @@ def tracking_realtime_canny():
 
     while(True):
         ret, frame = cap.read()
-        frame=resize(frame,40)
+        frame=resize(frame,75)
 
         cv2.imshow('Orig', frame)
 
@@ -213,7 +260,7 @@ def match_temp_ball():
         w, h = t1.shape[::-1]
         res1 = cv2.matchTemplate(framegray, t1, cv2.TM_CCOEFF_NORMED)
 
-        threshold = 0.9
+        threshold = 0.8
         loc = np.where(res1 >= threshold)
 
         for pt in zip(*loc[::-1]):
@@ -240,7 +287,7 @@ def match_temp_robot():
         w, h = t2.shape[::-1]
         res1 = cv2.matchTemplate(framegray, t2, cv2.TM_CCOEFF_NORMED)
 
-        threshold = 0.77
+        threshold = 0.75
         loc = np.where(res1 >= threshold)
 
         for pt in zip(*loc[::-1]):
@@ -250,11 +297,3 @@ def match_temp_robot():
 
         if(cv2.waitKey(1) & 0xFF == ord('q')):
             break
-            
-
-'''
-tracking_realtime_img_grad()
-tracking_realtime_canny()
-match_temp_ball()
-match_temp_robot()
-'''

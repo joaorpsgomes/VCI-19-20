@@ -133,8 +133,12 @@ def tracking_realtime_filtered():
 
         
         contours, hierarchy = cv.findContours(frame_filtered, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-
-        cv.drawContours(frame, contours, -1, (0,255,0), 3)
+        if s!=5 and s!=1:
+            for i in range(len(contours)):
+                x,y,w,h = cv.boundingRect(contours[i])
+                frame = cv.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)
+        else:
+            cv.drawContours(frame, contours, -1, (0,255,0), 3)
         cv.imshow('Original vs Filtered', frame)
 
         
@@ -149,13 +153,15 @@ def contours_apply(frame):
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("-r","--trackingrealtimefiltered", help="Complete tracking in real time",
+parser.add_argument("-r","--trackingrealtimefiltered", help="Complete tracking in real time using contours",
                     action="store_true")
 parser.add_argument("-g","--trackingrealtimeimggrad", help="Tracking in real time using gradient",
                     action="store_true")
 parser.add_argument("-m","--matchtempball", help="Template match ball",
                     action="store_true")
 parser.add_argument("-t","--matchtemprobot", help="Template match robot",
+                    action="store_true")
+parser.add_argument("-y","--canny", help="Apply canny detection",
                     action="store_true")
 parser.add_argument("-c","--houghcircle", help="Apply hough methot with circle",
                     action="store_true")
@@ -174,6 +180,8 @@ elif args.matchtempball:
     match_temp_ball()
 elif args.matchtemprobot:
     match_temp_robot()
+elif args.canny:
+    tracking_realtime_canny()
 elif args.houghcircle:
     hough_circle()
 elif args.houghline:
