@@ -2,7 +2,7 @@ import numpy as np
 import cv2 as cv
 import math
 import argparse
-
+import os
 
 def nothing(x):
     print()
@@ -397,6 +397,7 @@ def optical_flow():
             good_new = p1[st==1]
             good_old = p0[st==1]
             # draw the tracks
+            os.system('clear')
             for i,(new,old) in enumerate(zip(good_new, good_old)):
                 a,b = new.ravel()
                 t,d = old.ravel()
@@ -452,7 +453,7 @@ def optical_flow():
                 
                 mask_of = cv.line(mask_of, (a,b),(t,d), color[i].tolist(), 2)
                 frame = cv.circle(frame,(a,b),5,color[i].tolist(),-1)
-
+            
             img = cv.add(frame,mask_of)
             cv.imshow('result',img)
             k = cv.waitKey(30) & 0xff
