@@ -70,7 +70,7 @@ def tracking_realtime_filtered():
 
     while(True):
         ret, frame = cap.read()
-        frame=resize(frame,45)
+        frame=resize(frame,60)
 
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
