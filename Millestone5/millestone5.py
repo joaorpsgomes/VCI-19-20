@@ -466,6 +466,29 @@ def optical_flow():
             cv.destroyAllWindows()
             break
         
+def playvideos():
+    cap = cv.VideoCapture('csrt.mp4')
+    cap2= cv.VideoCapture('kcf.mp4')
+    cap3= cv.VideoCapture('boosting.mp4')
+
+    while(True):
+
+        ret, frame= cap.read()
+        ret2, frame2= cap2.read()
+        ret3, frame3= cap3.read()
+
+        cv.imshow('csrt',frame)
+        cv.imshow('kcf',frame2)
+        cv.imshow('boosting',frame3)
+        cv.waitKey(10)
+        if cv.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    # When everything done, release the capture
+    cap.release()
+    cap2.release()
+    cap3.release()
+    cv.destroyAllWindows()
 
 
 
@@ -477,6 +500,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-t","--trackingID", help="Tracking balls and robots with ID",
                     action="store_true")
 parser.add_argument("-p","--opticalflow", help="Tracking distance traveled by the ball and robots ",action="store_true")
+parser.add_argument("-v","--multitracking", help="Multi tracking algorithms videos",action="store_true")
 
                   
 args = parser.parse_args()
@@ -486,3 +510,5 @@ if args.trackingID:
     tracking_with_ID()
 elif args.opticalflow:
     optical_flow()
+elif args.multitracking:
+    playvideos()
