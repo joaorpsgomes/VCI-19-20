@@ -50,7 +50,7 @@ def tracking_with_ID():
     ret, frame = cap.read()
     frame=resize(frame,25)
     height, width = frame.shape[:2]
-	            
+                
     while(True):
         ret, frame = cap.read()
         if ret==True:
@@ -78,16 +78,18 @@ def tracking_with_ID():
             mask  = mask_ball+mask_orange
             frame_filtered = cv.bitwise_or(fin, fin, mask=mask)
             frame_filtered = cv.cvtColor(frame_filtered, cv.COLOR_BGR2GRAY)
-            ret, frame_filtered = cv.threshold(frame_filtered, 90, 255, 0)
+            #ret, frame_filtered = cv.threshold(frame_filtered, 90, 255, 0)
+            frame_filtered = cv.Canny(frame_filtered,150,200,L2gradient=True)
             frame_filtered = cv.GaussianBlur(frame_filtered,(7,7),cv.BORDER_DEFAULT)
-            #cv.imshow('filtred',frame_filtered)
+            cv.imshow('filtered balls',frame_filtered)
             
             frame_filtered_robot = cv.bitwise_and(fin, fin, mask=mask_blue)
             frame_filtered_robot = cv.cvtColor(frame_filtered_robot, cv.COLOR_BGR2GRAY)
-            ret, frame_filtered_robot = cv.threshold(frame_filtered_robot, 127, 255, 0)
+            #ret, frame_filtered_robot = cv.threshold(frame_filtered_robot, 127, 255, 0)
+            frame_filtered_robot = cv.Canny(frame_filtered_robot,150,200,L2gradient=True)
             frame_filtered_robot = cv.GaussianBlur(frame_filtered_robot,(7,7),cv.BORDER_DEFAULT)
+            cv.imshow('filtered robot',frame_filtered_robot)
         
-            
             
             contours, hierarchy = cv.findContours(frame_filtered, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
             contours_robot, hierarchy_robot = cv.findContours(frame_filtered_robot, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
@@ -470,7 +472,7 @@ def optical_flow():
 def playvideos():
     cap = cv.VideoCapture('csrt.mp4')
     cap2= cv.VideoCapture('kcf.mp4')
-    cap3= cv.VideoCapture('boosting.mp4')
+    cap3= cv.VideoCapture('mosse.mp4')
 
     while(True):
 
@@ -478,10 +480,10 @@ def playvideos():
         ret2, frame2= cap2.read()
         ret3, frame3= cap3.read()
 
-        cv.imshow('csrt',frame)
         cv.imshow('kcf',frame2)
-        cv.imshow('boosting',frame3)
-        cv.waitKey(10)
+        cv.imshow('mosse',frame3)      
+        cv.imshow('csrt',frame)
+        cv.waitKey(30)
         if cv.waitKey(1) & 0xFF == ord('q'):
             break
 
