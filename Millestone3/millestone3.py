@@ -14,6 +14,9 @@ def resize(image,scl):
 def nothing(x):
     print(x)
 
+'''
+    Tracking Mouse and recognize events and position
+'''
 def setMouseCallback():
     window_name = 'Detect_mouse'
 
@@ -23,17 +26,17 @@ def setMouseCallback():
 
 
     def events(event, x,y,flags, params):
-        if event == cv2.EVENT_LBUTTONDBLCLK:
+        if event == cv2.EVENT_LBUTTONDBLCLK:                                # recognize left double click
             print('Left double click \n')
-        elif event==cv2.EVENT_MOUSEMOVE and flags==cv2.EVENT_FLAG_CTRLKEY:
+        elif event==cv2.EVENT_MOUSEMOVE and flags==cv2.EVENT_FLAG_CTRLKEY:  # recognize mouse move
             print('Mouse move \n') 
-        elif event==cv2.EVENT_LBUTTONDOWN:
+        elif event==cv2.EVENT_LBUTTONDOWN:                                  # recognize left  click
             print('Left click \n') 
-        elif event==cv2.EVENT_RBUTTONDOWN:
+        elif event==cv2.EVENT_RBUTTONDOWN:                                  # recognize righ click
             print('Rigth click \n')
-        elif event==cv2.EVENT_MBUTTONDOWN:
+        elif event==cv2.EVENT_MBUTTONDOWN:                                  # recognize middle click
             print('Middle click\n')
-        elif x==100 and y==100:
+        elif x==100 and y==100:                                             # recongize the position of mouse 
             print('X=100 and Y==100\n')
 
 
@@ -42,15 +45,19 @@ def setMouseCallback():
 
     while(True):
         cv2.imshow(window_name, img)
-        if(cv2.waitKey(1) & 0xFF == ord('q')):
+        if(cv2.waitKey(1) & 0xFF == ord('q')):                             
                 break
 
 
+'''
+    Initialization of trackbar
+'''
 def init_trackbar():
     cv2.namedWindow('image')
+    
+    # initialization of range
     ilowH = 0
     ihighH = 180
-
     ilowS = 0
     ihighS = 255
     ilowV = 0
@@ -66,6 +73,10 @@ def init_trackbar():
     cv2.createTrackbar('lowV','image',ilowV,255,nothing)
     cv2.createTrackbar('highV','image',ihighV,255,nothing)
 
+'''
+    Segment the most important colors of the CAMBADA soccer field based on color threshold.
+    This threshold is controlled by the developed trackbars.
+'''
 def trackbar_realtime():
 
     init_trackbar()
@@ -73,7 +84,8 @@ def trackbar_realtime():
     while(True):
         img=cv2.imread('cambada_image.png',1) 
         frame=resize(img,60)
-        
+
+        # Get trackbars of each component
         ilowH = cv2.getTrackbarPos('lowH', 'image')
         ihighH = cv2.getTrackbarPos('highH', 'image')
         ilowS = cv2.getTrackbarPos('lowS', 'image')
@@ -81,12 +93,12 @@ def trackbar_realtime():
         ilowV = cv2.getTrackbarPos('lowV', 'image')
         ihighV = cv2.getTrackbarPos('highV', 'image')
 
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        lower_hsv = np.array([ilowH, ilowS, ilowV])
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)        # convert image BRG to HSV
+        lower_hsv = np.array([ilowH, ilowS, ilowV])         
         higher_hsv = np.array([ihighH, ihighS, ihighV])
         mask = cv2.inRange(hsv, lower_hsv, higher_hsv)
 
-        frame = cv2.bitwise_and(frame, frame, mask=mask)
+        frame = cv2.bitwise_and(frame, frame, mask=mask)    # merge between image and hsv mask
 
         # show thresholded image
         cv2.imshow('image', frame)
@@ -95,18 +107,21 @@ def trackbar_realtime():
         if(cv2.waitKey(1) & 0xFF == ord('q')):
             break
 
+'''
+    Tracking ball with hsv mask
+'''
 def tracking_ball():
     
     while(True):
         frame=cv2.imread('cambada_image.jpg',1) 
         frame=resize(frame,60)
 
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        lower_hsv = np.array([22, 77, 88])
-        higher_hsv = np.array([41, 254, 255])
-        mask = cv2.inRange(hsv, lower_hsv, higher_hsv)
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)        # convert image BRG to HSV
+        lower_hsv = np.array([22, 77, 88])                  # lower range of ball image in hsv
+        higher_hsv = np.array([41, 254, 255])               # higher range of ball image in hsv
+        mask = cv2.inRange(hsv, lower_hsv, higher_hsv)      # total range of ball image in shv
 
-        frame = cv2.bitwise_and(frame, frame, mask=mask)
+        frame = cv2.bitwise_and(frame, frame, mask=mask)    # merge between image and hsv ball mask
 
         # show thresholded image
         cv2.imshow('image', frame)
@@ -114,18 +129,23 @@ def tracking_ball():
 
         if(cv2.waitKey(1) & 0xFF == ord('q')):
             break
+
+'''
+    Tracking blue team with hsv mask
+'''
 
 def tracking_blue_team():
     while(True):
         frame=cv2.imread('cambada_image.jpg',1) 
         frame=resize(frame,60)
 
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        lower_hsv = np.array([88, 90, 46])
-        higher_hsv = np.array([106, 255, 255])
-        mask = cv2.inRange(hsv, lower_hsv, higher_hsv)
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)        # convert image BRG to HSV
+        lower_hsv = np.array([88, 90, 46])                  # lower range of blue team image in hsv
+        higher_hsv = np.array([106, 255, 255])              # higher range of blue team image in hsv
+        mask = cv2.inRange(hsv, lower_hsv, higher_hsv)      # total range of blue team image in shv
 
-        frame = cv2.bitwise_and(frame, frame, mask=mask)
+        frame = cv2.bitwise_and(frame, frame, mask=mask)    # merge between image and hsv blue team mask
+
 
         # show thresholded image
         cv2.imshow('image', frame)
@@ -134,17 +154,21 @@ def tracking_blue_team():
         if(cv2.waitKey(1) & 0xFF == ord('q')):
             break
 
+'''
+    Tracking orange team with hsv mask
+'''
 def tracking_orange_team():
     while(True):
         frame=cv2.imread('cambada_image.jpg',1) 
         frame=resize(frame,60)
 
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        lower_hsv = np.array([0, 89, 0])
-        higher_hsv = np.array([20, 255, 196])
-        mask = cv2.inRange(hsv, lower_hsv, higher_hsv)
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)        # convert image BRG to HSV
+        lower_hsv = np.array([0, 89, 0])                    # lower range of orange team image in hsv
+        higher_hsv = np.array([20, 255, 196])               # higher range of orange team image in hsv
+        mask = cv2.inRange(hsv, lower_hsv, higher_hsv)      # total range of orange team image in shv
 
-        frame = cv2.bitwise_and(frame, frame, mask=mask)
+
+        frame = cv2.bitwise_and(frame, frame, mask=mask)    # merge between image and hsv orange team mask
 
         # show thresholded image
         cv2.imshow('image', frame)
@@ -153,20 +177,22 @@ def tracking_orange_team():
         if(cv2.waitKey(1) & 0xFF == ord('q')):
             break
 
-
+'''
+    Tracking lines with hsv mask
+'''
 def tracking_lines():
     while(True):
         frame=cv2.imread('cambada_image.jpg',1) 
         frame=resize(frame,60)
 
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        #lower_hsv = np.array([0, 0, 0])
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)            # convert image BRG to HSV
+        #lower_hsv = np.array([0, 0, 0])    
         #higher_hsv = np.array([179, 33, 255])
-        lower_hsv = np.array([0, 0, 162])
-        higher_hsv = np.array([179, 49, 255])
-        mask = cv2.inRange(hsv, lower_hsv, higher_hsv)
+        lower_hsv = np.array([0, 0, 162])                       # lower range of lines image in hsv
+        higher_hsv = np.array([179, 49, 255])                   # higher range of lines image in hsv
+        mask = cv2.inRange(hsv, lower_hsv, higher_hsv)          # total range of lines image in shv
 
-        frame = cv2.bitwise_and(frame, frame, mask=mask)
+        frame = cv2.bitwise_and(frame, frame, mask=mask)        # merge between image and hsv lines mask
 
         # show thresholded image
         cv2.imshow('image', frame)
@@ -175,6 +201,9 @@ def tracking_lines():
         if(cv2.waitKey(1) & 0xFF == ord('q')):
             break
 
+'''
+    Tracking ball,teams and lines with hsv mask
+'''
 def tracking_realtime():
 
     cap = cv2.VideoCapture('cambada_video.mp4')

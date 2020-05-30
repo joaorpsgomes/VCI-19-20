@@ -57,6 +57,9 @@ def resize(image,scl):
     image_resized = cv2.resize(image, dim_image, interpolation = cv2.INTER_AREA)
     return image_resized
 
+'''
+    Perform ball detection using the Hough transform
+'''
 def hough_circle():
     cap = cv2.VideoCapture('cambada_video.mp4')
     cv2.namedWindow('image')
@@ -64,26 +67,25 @@ def hough_circle():
     while(1):
         ret, frame = cap.read()
         frame=resize(frame,100)
-        frame_ori=limit_area_to_field(frame)
-        hsv = cv2.cvtColor(frame_ori, cv2.COLOR_BGR2HSV)
+        frame_ori=limit_area_to_field(frame)                    # limit interest area
+        hsv = cv2.cvtColor(frame_ori, cv2.COLOR_BGR2HSV)        # convert BRG to HSV
         lower_hsv_ball = np.array([22, 77, 88])
         higher_hsv_ball = np.array([41, 254, 255])
-        mask_ball = cv2.inRange(hsv, lower_hsv_ball, higher_hsv_ball)
+        mask_ball = cv2.inRange(hsv, lower_hsv_ball, higher_hsv_ball)       # range HSV level
 
-        img = cv2.bitwise_and(frame_ori, frame_ori, mask=mask_ball)
+        img = cv2.bitwise_and(frame_ori, frame_ori, mask=mask_ball)         # merge between frame and ball mask
         kernel = np.ones((5,5),np.uint8)
         #img = cv2.dilate(img,kernel,iterations = 1)
         #img = cv2.erode(img,kernel,iterations = 1)
         #cv2.imshow('erosion',img)
 
 
-        cimg = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+        cimg = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)                         # convert frame BRG to GRAY
         #cimg = cv2.medianBlur(cimg,5)
         thresh = cv2.threshold(cimg, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
 
+        # Aply hough circles methods
         circles = cv2.HoughCircles(thresh,cv2.HOUGH_GRADIENT,3,100,param1=50,param2=30,minRadius=1,maxRadius=25)
-
-
 
         '''
         HOUGH_GRADIENT: Define the detection method. Currently this is the only one available in OpenCV.
@@ -95,6 +97,7 @@ def hough_circle():
         max_radius =: Maximum radius to be detected. If unknown, put zero as default.
         '''
 
+        # draw circles in correspond position
         if circles is not None:
             circles = np.round(circles[0, :]).astype("int")
             for (x,y,r) in circles:
@@ -105,6 +108,10 @@ def hough_circle():
             break
 
     cv2.destroyAllWindows()
+
+'''
+    Perform line detection using the Hough transform    
+'''
 def hough_line():
     cap = cv2.VideoCapture('cambada_video.mp4')
     #cv2.namedWindow('Result')
@@ -116,17 +123,17 @@ def hough_line():
         hsv = cv2.cvtColor(frame_ori, cv2.COLOR_BGR2HSV)
         lower_hsv_lines = np.array([0, 0, 162])
         higher_hsv_lines = np.array([179, 49, 255])
-        mask_lines = cv2.inRange(hsv, lower_hsv_lines, higher_hsv_lines)
+        mask_lines = cv2.inRange(hsv, lower_hsv_lines, higher_hsv_lines)                # range HSV level
 
-        frame = cv2.bitwise_and(frame_ori, frame_ori, mask=mask_lines)
+        frame = cv2.bitwise_and(frame_ori, frame_ori, mask=mask_lines)                  # merge between frame and ball mask
         #kernel = np.ones((5,5),np.uint8)
         #frame = cv2.dilate(frame,kernel,iterations = 1)
         #frame = cv2.erode(frame,kernel,iterations = 1)
 
 
         #cv2.imshow('frame_with_mask', frame)
-        gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
-        edges = cv2.Canny(gray,50,150,apertureSize = 3)
+        gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)                                   # convert BRG to GRAY
+        edges = cv2.Canny(gray,50,150,apertureSize = 3)                                 # aplly canny edges 
         lines = cv2.HoughLinesP(edges,10,np.pi/180,10,minLineLength=0,maxLineGap=0)
         for line in lines:
             x1,y1,x2,y2 = line[0]
