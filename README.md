@@ -1,31 +1,31 @@
 # VCI-19-20
 Projecto para a cadeira de Visão por computador 2019/20
 
-Millestone1
+Milestone1
 
 Import: .numpy
 	.cv2
 	.time
-	.argaparse
+	.argparse
 
 Milleston2
 
 Import: .numpy
 	.cv2
 	.time
-	.argaparse
+	.argparse
 
-Milleston3
-
-Import: .numpy
-	.cv2
-	.argaparse
-
-Milleston4
+Milestone3
 
 Import: .numpy
 	.cv2
-	.argaparse
+	.argparse
+
+Milestone4
+
+Import: .numpy
+	.cv2
+	.argparse
 	.tracking_realtime_img_grad from canny.py
 	.tracking_realtime_canny from canny.py
 	.match_temp_ball from canny.py
@@ -33,13 +33,23 @@ Import: .numpy
 	.hough_circle from hough.py
 	.hough_line from hough.py
 
-Milleston5
+Milestone5
 
 Import: .numpy
 	.cv2
-	.argaparse
+	.argparse
 	.math
 	.os
+
+Packages:
+pip install -U pip
+pip install opencv-python
+pip install opencv-contrib-python
+pip install numpy
+pip install pip
+pip install argparse
+pip install python-time
+
 
 
 

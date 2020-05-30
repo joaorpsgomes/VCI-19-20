@@ -154,6 +154,10 @@ def histogram_calculation(colorspace):
 	cap.release()
 	cv2.destroyAllWindows()
 
+'''
+Various functions used to blur images in several different ways, with appropriate images to show better and clearer results
+'''
+
 
 def BlurImages():
 

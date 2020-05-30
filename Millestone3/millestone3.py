@@ -15,7 +15,7 @@ def nothing(x):
     print(x)
 
 '''
-    Tracking Mouse and recognize events and position
+    Tracking the mouse and recognizing events and positions
 '''
 def setMouseCallback():
     window_name = 'Detect_mouse'
@@ -50,7 +50,7 @@ def setMouseCallback():
 
 
 '''
-    Initialization of trackbar
+    Initialize the trackbar
 '''
 def init_trackbar():
     cv2.namedWindow('image')
@@ -74,7 +74,7 @@ def init_trackbar():
     cv2.createTrackbar('highV','image',ihighV,255,nothing)
 
 '''
-    Segment the most important colors of the CAMBADA soccer field based on color threshold.
+    Segments the most important colors of the CAMBADA's soccer field based on color threshold.
     This threshold is controlled by the developed trackbars.
 '''
 def trackbar_realtime():
@@ -358,7 +358,7 @@ def tracking_realtime_filtered():
         if(cv2.waitKey(1) & 0xFF == ord('q')):
             break
 
-#Image Segmentation with Distance Transform and Watershed Algorithm 
+
 '''
 def simplest_thresholds():
 
@@ -383,6 +383,9 @@ def simplest_thresholds():
     plt.show()
 '''
 
+'''
+Image Segmentations
+'''
 
 def simplest_thresholds():
 
@@ -453,6 +456,10 @@ def simplest_thresholds():
 
         if(cv2.waitKey(1) & 0xFF == ord('q')):
             break
+
+'''
+Watershed algorithm example with an image
+'''
         
 
 def seg_algorithms_img():
@@ -504,6 +511,11 @@ def seg_algorithms_img():
 
         if(cv2.waitKey(1) & 0xFF == ord('q')):
             break
+
+'''
+Region growing algorithm:
+Press mouse click 1 to choose the region and press 'Q' once to show the algorithm result. Press 'Q' again to close all windows
+'''
 
 def region_growing():
     def get8n(x, y, shape):
