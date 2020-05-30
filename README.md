@@ -51,6 +51,7 @@ pip install argparse
 pip install python-time
 pip install opencv-python tensorflow
 pip install cvlib
+pip install imutils
 
 
 
