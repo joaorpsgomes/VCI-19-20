@@ -29,7 +29,7 @@ def saveimage():
 	cv2.imwrite('./image.png',PlayVideoRealTime())
 			
 
-	
+#A função PlayVideoRealTime() serve para mostrar a cãmara (do pc ou associada) em tempo real	
 
 def PlayVideoRealTime():
 	cap = cv2.VideoCapture(0)
@@ -183,6 +183,8 @@ def intensitynormalization():
 	cap.release()
 	cv2.destroyAllWindows()
 
+# Esta função, como o próprio nome diz, dá uso às funções que gravam e guardam os vídeos num formato, fps e dimensões pré-definidas
+
 def SaveVideo():
 	cap = cv2.VideoCapture(0)
 	#fourcc = cv2.VideoWriter_fourcc(*'MJPG')  
@@ -210,9 +212,6 @@ def SaveVideo():
 
 
 
-
-
-import argparse
 parser = argparse.ArgumentParser()
 
 parser.add_argument("-e","--FrameRate", help="print frame rate",
