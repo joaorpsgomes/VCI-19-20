@@ -15,35 +15,43 @@ def resize(image,scl):
     return image_resized
 
 
+'''
+    Function that allow draw label in video
+'''
 def __draw_label(img, text, pos, bg_color):
     font_face = cv.FONT_HERSHEY_SIMPLEX
-    scale = 0.4
-    color = (0, 0, 0)
+    scale = 0.4                                  # size of text
+    color = (0, 0, 0)                            # color of text
     thickness = cv.FILLED
     margin = 2
     txt_size = cv.getTextSize(text, font_face, scale, thickness)
-    end_x = pos[0] + txt_size[0][0] + margin
-    end_y = pos[1] - txt_size[0][1] - margin
-    cv.rectangle(img, pos, (end_x, end_y), bg_color, thickness)
+    end_x = pos[0] + txt_size[0][0] + margin    # x position
+    end_y = pos[1] - txt_size[0][1] - margin    # y position
+    cv.rectangle(img, pos, (end_x, end_y), bg_color, thickness)     # draw tectangle in position (x,y)
     cv.putText(img, text, pos, font_face, scale, color, 1, cv.LINE_AA)
 
 
 def limit_area_to_field(frame):
     
-        #mask for area of interest
+        # mask for area of interest
         black = np.zeros((frame.shape[0], frame.shape[1], 3), np.uint8)
-        black = cv.rectangle(black,(0,52), (426, frame.shape[1]),(255, 255, 255), -1)   #---the dimension of the ROI
-        gray = cv.cvtColor(black,cv.COLOR_BGR2GRAY)               #---converting to gray
+        black = cv.rectangle(black,(0,52), (426, frame.shape[1]),(255, 255, 255), -1)   # the dimension of the ROI
+        gray = cv.cvtColor(black,cv.COLOR_BGR2GRAY)                                     # converting to gray
         ret,b_mask = cv.threshold(gray,127,255, 0)
-        fin = cv.bitwise_and(frame,frame,mask = b_mask)
+        fin = cv.bitwise_and(frame,frame,mask = b_mask)                                 # merge between frame and mask
         return fin
 
-def pixel2meter(pixels):
+'''
+    Convert pixels frame to meters
+'''
+def pixel2meter(pixels):                                
     meter_per_pixel=0.025
     meter=pixels*meter_per_pixel
     return meter
 
-
+'''
+    Algorithm to perform multi-object (balls,robots) tracking
+'''
 def tracking_with_ID():
     cap = cv.VideoCapture('cambada_2.mp4')
     cv.namedWindow('Result')
@@ -94,7 +102,8 @@ def tracking_with_ID():
             contours, hierarchy = cv.findContours(frame_filtered, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
             contours_robot, hierarchy_robot = cv.findContours(frame_filtered_robot, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
             l=len(contours)
-            #print(l)
+            
+            # define IDs of differents balls
             for i in range(len(contours)):
                 x,y,w,h = cv.boundingRect(contours[i])
 
@@ -149,6 +158,7 @@ def tracking_with_ID():
             
                 frame = cv.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)
             lc=len(contours_robot)
+            # define IDs of differents robots
             for i in range(len(contours_robot)):
                 x,y,w,h = cv.boundingRect(contours_robot[i])
 
@@ -264,6 +274,8 @@ def optical_flow():
             contours, hierarchy = cv.findContours(frame_filtered, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
             contours_robot, hierarchy_robot = cv.findContours(frame_filtered_robot, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
             l=len(contours)
+
+            # define IDs of differents balls and save coordinates
             for i in range(len(contours)):
                 x,y,w,h = cv.boundingRect(contours[i])
                 b=[[[np.float32(x+offset),np.float32(y+offset)]]]       # auxiliar array                
@@ -363,6 +375,8 @@ def optical_flow():
             
                 frame = cv.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)
             lc=len(contours_robot)
+
+            # define IDs of differents tobots and save their coordinates
             for i in range(len(contours_robot)):
                 x,y,w,h = cv.boundingRect(contours_robot[i])
                 b=[[[np.float32(x+offset),np.float32(y+offset)]]]
@@ -400,14 +414,16 @@ def optical_flow():
             good_old = p0[st==1]
             # draw the tracks
             os.system('clear')
+
+            # tracking balls and robots , calculate the distance in meters
             for i,(new,old) in enumerate(zip(good_new, good_old)):
                 a,b = new.ravel()
                 t,d = old.ravel()
 
                 if t<=xr1+margin and t>=xr1-margin and d<=yr1+margin and d>=yr1-margin:
-                    m=math.sqrt((a-t)*(a-t)+(b-d)*(b-d))
+                    m=math.sqrt((a-t)*(a-t)+(b-d)*(b-d))                # calculate the distance in pixels
                     dist_robot1=dist_robot1+m
-                    dist_robot1_meter=pixel2meter(dist_robot1)
+                    dist_robot1_meter=pixel2meter(dist_robot1)          # convert distance of pixels to meters
                     print("Distance Robot1 : %f meters" % dist_robot1_meter)
                 
                 if t<=xr2+margin and t>=xr2-margin and d<=yr2+margin and d>=yr2-margin:

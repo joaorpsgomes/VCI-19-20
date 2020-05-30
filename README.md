@@ -33,6 +33,13 @@ Import: .numpy
 	.hough_circle from hough.py
 	.hough_line from hough.py
 
+Milleston5
+
+Import: .numpy
+	.cv2
+	.argaparse
+	.math
+	.os
 
 
 
