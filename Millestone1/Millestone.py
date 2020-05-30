@@ -28,8 +28,9 @@ def saveimage():
 	
 	cv2.imwrite('./image.png',PlayVideoRealTime())
 			
-
-#A função PlayVideoRealTime() serve para mostrar a cãmara (do pc ou associada) em tempo real	
+'''
+This function PlayVideoRealTime() is used to show the camera in real time (of our pc or an associated one)
+'''
 
 def PlayVideoRealTime():
 	cap = cv2.VideoCapture(0)
@@ -78,7 +79,7 @@ def watermark():
 			break
 
 '''
-	Add a image watermark in the current video that is captured by camera	
+	Add an image watermark in the current video that is captured by camera	
 '''
 def watermarkimage():
 	cap = cv2.VideoCapture(0)										# capture images from camera
@@ -161,7 +162,7 @@ def white_balance():
 
 
 '''
-	Normlize the frame of video
+	Normalize a video frame
 '''
 def intensitynormalization():
 
@@ -182,8 +183,10 @@ def intensitynormalization():
 	# When everything done, release the capture
 	cap.release()
 	cv2.destroyAllWindows()
-
-# Esta função, como o próprio nome diz, dá uso às funções que gravam e guardam os vídeos num formato, fps e dimensões pré-definidas
+	
+'''
+Record and save the videos in a pre-determined format, fps and dimensions
+'''
 
 def SaveVideo():
 	cap = cv2.VideoCapture(0)
