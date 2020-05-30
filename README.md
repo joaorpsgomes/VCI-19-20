@@ -49,6 +49,8 @@ pip install numpy
 pip install pip
 pip install argparse
 pip install python-time
+pip install opencv-python tensorflow
+pip install cvlib
 
 
 

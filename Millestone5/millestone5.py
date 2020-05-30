@@ -16,7 +16,7 @@ def resize(image,scl):
 
 
 '''
-    Function that allow draw label in video
+    Function that allows the drawing of a label
 '''
 def __draw_label(img, text, pos, bg_color):
     font_face = cv.FONT_HERSHEY_SIMPLEX
@@ -50,7 +50,7 @@ def pixel2meter(pixels):
     return meter
 
 '''
-    Algorithm to perform multi-object (balls,robots) tracking
+    Algorithm to perform multi-object (balls,robots) tracking in a CAMBADA video that associates its label to its "order of arrival" in real time
 '''
 def tracking_with_ID():
     cap = cv.VideoCapture('cambada_2.mp4')

@@ -57,6 +57,10 @@ def limit_area_to_field(frame):
         #cv.imshow('Original vs Filtered', fin)
         return fin
 
+'''
+Application of the Sobel and Scharr image gradients in the CAMBADA videos with HSV filters already
+'''
+
 def tracking_realtime_img_grad():
     cap = cv2.VideoCapture('cambada_video.mp4')
 
@@ -102,7 +106,10 @@ def tracking_realtime_img_grad():
 
         if(cv2.waitKey(1) & 0xFF == ord('q')):
             break
-
+        
+'''
+Application of the Laplace image gradients in the CAMBADA videos with HSV filters already
+'''
 
 def tracking_realtime_laplace():
     cap = cv2.VideoCapture('cambada_video.mp4')
@@ -177,6 +184,10 @@ def tracking_realtime_laplace():
         if(cv2.waitKey(1) & 0xFF == ord('q')):
             break
 
+'''
+Application of the Canny Edge detection in the CAMBADA videos with HSV filters already
+'''
+
 def tracking_realtime_canny():
     cap = cv2.VideoCapture('cambada_video.mp4')
     cv2.namedWindow('Original vs Filtered')
@@ -244,6 +255,10 @@ def tracking_realtime_canny():
         if(cv2.waitKey(1) & 0xFF == ord('q')):
             break
 
+'''
+Template matching in a CAMBADA video to detect the ball
+'''
+
 def match_temp_ball():
     template = cv2.imread('1.png')
     cv2.imshow('template', template)
@@ -270,6 +285,10 @@ def match_temp_ball():
 
         if(cv2.waitKey(1) & 0xFF == ord('q')):
             break
+
+'''
+Template matching in a CAMBADA video to detect a robot
+'''
 
 def match_temp_robot():
     template = cv2.imread('3.png')
