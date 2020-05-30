@@ -77,24 +77,28 @@ def watermark():
 			cv2.imwrite('./watermark.png',watermark)
 			break
 
+'''
+	Add a image watermark in the current video that is captured by camera	
+'''
 def watermarkimage():
-	cap = cv2.VideoCapture(0)
-	image = cv2.imread('group_logo.jpg',1)
+	cap = cv2.VideoCapture(0)										# capture images from camera
+	image = cv2.imread('group_logo.jpg',1)		
 	oH,oW = image.shape[:2]
     #image = np.dstack([image, np.ones((oH,oW), dtype="uint8") * 255])
-	image_resized=resize(image,7)
-	watermark = cv2.cvtColor(image_resized, cv2.COLOR_BGR2BGRA)
+	image_resized=resize(image,7)									# resize image
+	watermark = cv2.cvtColor(image_resized, cv2.COLOR_BGR2BGRA)		# convert image BRG to GRAY	
+	
 	while(True):
 
-		ret, frame= cap.read()
+		ret, frame= cap.read()	
 
-		frame = cv2.cvtColor(frame, cv2.COLOR_BGR2BGRA)
+		frame = cv2.cvtColor(frame, cv2.COLOR_BGR2BGRA)				# convert image BRG to GRAY	
 		frame_h, frame_w, frame_c = frame.shape
 
 		overlay = np.zeros((frame_h, frame_w, 4), dtype='uint8')
 		watermark_h, watermark_w, watermark_c = watermark.shape
 
-		for i in range(0, watermark_h):
+		for i in range(0, watermark_h):								# add the image in the wanted position
 			for j in range(0, watermark_w):
 				if watermark[i,j][3] != 0:
 					offset = 10
@@ -102,11 +106,11 @@ def watermarkimage():
 					w_offset = frame_w - watermark_w - offset
 					overlay[h_offset + i, w_offset+ j] = watermark[i,j]
 
-		cv2.addWeighted(overlay, 0.50, frame, 0.9, 0, frame) #addWeighted(logo,intensity,frame,exposure,...) 
+		cv2.addWeighted(overlay, 0.50, frame, 0.9, 0, frame) 		# addWeighted(logo,intensity,frame,exposure,...) 
 
-		frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
+		frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)				# convert image BRA to BRG
 
-		cv2.imshow('watermark',frame)
+		cv2.imshow('watermark',frame)				
 
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
@@ -155,6 +159,10 @@ def white_balance():
 	cap.release()
 	cv2.destroyAllWindows()
 
+
+'''
+	Normlize the frame of video
+'''
 def intensitynormalization():
 
 	cap=cv2.VideoCapture(0)
@@ -165,7 +173,7 @@ def intensitynormalization():
 		cv2.imshow('frame',frame)
 
 		normalizedImg = np.zeros((800, 800))
-		normalizedImg = cv2.normalize(frame,  normalizedImg, 0, 255, cv2.NORM_MINMAX)
+		normalizedImg = cv2.normalize(frame,  normalizedImg, 0, 255, cv2.NORM_MINMAX)		# normalize the frame 
 		cv2.imshow('dst_rt', normalizedImg)
 		
 		if cv2.waitKey(1) & 0xFF == ord('q'):

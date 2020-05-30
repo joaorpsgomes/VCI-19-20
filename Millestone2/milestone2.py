@@ -50,13 +50,16 @@ def estimateFrameRate(num_frame=30):
 	print("Capture {0:4d} frames in {1:3.2f} seconds   => frame rate = {2:3.2f}".format(num_frame,stop-start,num_frame/(stop-start)))
 
 
+'''
+	Convert the acquired images to grayscale and apply histogram equalization.
+'''
 def histogram_equalization():
 
 	while(True):
 		img=cv2.imread('dog.jpg',1) 
 		img=resize(img,40)
-		img_cvt= cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-		equalization= cv2.equalizeHist(img_cvt)
+		img_cvt= cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)			# convert image BRG to GRAY
+		equalization= cv2.equalizeHist(img_cvt)					# equalize image
 		
 		cv2.imshow('original',img)
 		cv2.imshow('Equalization',equalization)
@@ -67,47 +70,54 @@ def histogram_equalization():
 	
 	cv2.destroyAllWindows()
 
+'''
+	Calculate and display the histograms in real-time of the acquired and transformed images.
+'''
 def histogram_calculation(colorspace):
 		
 	cap = cv2.VideoCapture(0)
 
-	fourcc = cv2.VideoWriter_fourcc(*'MJPG')        
+	fourcc = cv2.VideoWriter_fourcc(*'MJPG')    			# save video with format MJPG    
 
 	while(cap.isOpened()):
 		ret, frame = cap.read()
 
 		if ret==True:
-			frame = cv2.flip(frame,1)       # flip frame
+			frame = cv2.flip(frame,1)       				# flip frame
 
-			if colorspace=='hsv':
+			if colorspace=='hsv':							# If want see frame in colorspace HSV
 				frame=cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 				#cv2.imshow('hsv',frame)
-			if colorspace=='yuv':
+			if colorspace=='yuv':							# If want see frame in colorspace YUV
 				frame=cv2.cvtColor(frame, cv2.COLOR_BGR2YUV)
 				#cv2.imshow('yuv',frame)
-			if colorspace=='rgb':
+			if colorspace=='rgb':							# If want see frame in colorspace RBG
 				frame=frame
 				#cv2.imshow('yuv',frame)
 
-			brg_planes=cv2.split(frame) # Separate the source image in its three R,G and B planes.
+			brg_planes=cv2.split(frame) 					# Separate the source image in its three R,G and B planes.
 			histsize=256
-			histrange=(0,256)       # the upper boundary is exclusive
+			histrange=(0,256)       						# the upper boundary is exclusive
 			accumulate=False
 
-			b_hist=cv2.calcHist(brg_planes,[0],None,[histsize],histrange,accumulate=accumulate)
-			r_hist=cv2.calcHist(brg_planes,[1],None,[histsize],histrange,accumulate=accumulate)
-			g_hist=cv2.calcHist(brg_planes,[2],None,[histsize],histrange,accumulate=accumulate)
+			b_hist=cv2.calcHist(brg_planes,[0],None,[histsize],histrange,accumulate=accumulate)		# calculate histogram of component B 
+			r_hist=cv2.calcHist(brg_planes,[1],None,[histsize],histrange,accumulate=accumulate)		# calculate histogram of component R
+			g_hist=cv2.calcHist(brg_planes,[2],None,[histsize],histrange,accumulate=accumulate)		# calculate histogram of component G
 
 			hist_w = 512
 			hist_h = 400
 			bin_w = int(round( hist_w/histsize ))
+
+			# initialize the images of histogram 
 			histImage = np.zeros((hist_h, hist_w, 3), dtype=np.uint8)
 			histImage2 = np.zeros((hist_h, hist_w, 3), dtype=np.uint8)
 			histImage3 = np.zeros((hist_h, hist_w, 3), dtype=np.uint8)
 
+			# normalize the images
 			cv2.normalize(b_hist, b_hist, alpha=0, beta=hist_h, norm_type=cv2.NORM_MINMAX)
 			cv2.normalize(g_hist, g_hist, alpha=0, beta=hist_h, norm_type=cv2.NORM_MINMAX)
 			cv2.normalize(r_hist, r_hist, alpha=0, beta=hist_h, norm_type=cv2.NORM_MINMAX)
+
 
 			for i in range(1, histsize):
 				cv2.line(histImage, ( bin_w*(i-1), hist_h - int(np.round(b_hist[i-1])) ),
@@ -123,6 +133,7 @@ def histogram_calculation(colorspace):
 					( 0, 0, 255), thickness=2)
 
 
+			# Display of images 
 			cv2.imshow('real-time video',frame)
 			if colorspace=='rgb':
 				cv2.imshow('Blue',histImage)
