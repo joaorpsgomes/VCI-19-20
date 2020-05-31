@@ -59,12 +59,47 @@ Projecto para a cadeira de Visão por computador 2019/20
 
 ## Milestone3
 
+* Usage Examples:
+	
+	* python3 Millestone.py -m
+		* Test MouseCallBack
+	* python3 Millestone.py -t
+		* Trackbar in an image
+	* python3 Millestone.py -r
+		* Tracks all game components in real time
+	* python3 Millestone.py -g
+		* Tracks all game components in real time in a grayscale
+	* python3 Millestone.py -s
+		* Exploring the basic thresholds in an image
+	* python3 Millestone.py -a
+		* Exploring image Segmentation with Distance
+        * Transform(commented)/Erosion and Watershed Algorithm
+	* python3 Millestone.py -w
+		* Exploring Region Growing
+
 * Import: 
 	* .numpy
 	* .cv2
 	* .argparse
 
 ## Milestone4
+
+* Usage Examples:
+	
+	* python3 Millestone.py -r
+		* Complete tracking in real time using contours
+	* python3 Millestone.py -g
+		* Tracking in real time using gradient
+	* python3 Millestone.py -m
+		* Template match ball
+	* python3 Millestone.py -t
+		* Template match robot
+	* python3 Millestone.py -y
+		* Apply canny detection
+	* python3 Millestone.py -c
+		* Apply hough methot with circle
+	* python3 Millestone.py -l
+		* Apply hough methot with lines
 
 * Import: 
 	* .numpy
@@ -79,6 +114,24 @@ Projecto para a cadeira de Visão por computador 2019/20
 
 ## Milestone5
 
+* Usage Examples:
+	
+	* python3 Millestone.py -t
+		* Tracking balls and robots with ID
+	* python3 Millestone.py -p
+		* Tracking distance traveled by the ball and robots
+	* python3 Millestone.py -v
+		* Multi tracking algorithms videos
+	* python3 multi_object_tracking.py -v cambada_2.mp4 -t csrt
+		* Play cambada_2.mp4 using csrt Tracker. To use it press 's' and select with mouse area to track thenspace to confirm. The tracker options are:
+			* csrt
+			* kcf
+			* boosting
+			* mil
+			* tld
+			* medianflow
+			* mosse
+
 * Import: 
 	* .numpy
 	* .cv2
@@ -86,16 +139,18 @@ Projecto para a cadeira de Visão por computador 2019/20
 	* .math
 	* .os
 
-##Packages:
-	* sudo apt-get install python3-pip
-	* pip3 install opencv-python
-	* pip3 install opencv-contrib-python
-	* pip3 install numpy
-	* pip3 install argparse
-	* pip3 install python-time
-	* pip3 install opencv-python tensorflow
-	* pip3 install cvlib
-	* pip3 install imutils
+
+## Packages:
+
+* sudo apt-get install python3-pip
+* pip3 install opencv-python
+* pip3 install opencv-contrib-python
+* pip3 install numpy
+* pip3 install argparse
+* pip3 install python-time
+* pip3 install opencv-python tensorflow
+* pip3 install cvlib
+* pip3 install imutils
 
 
 
