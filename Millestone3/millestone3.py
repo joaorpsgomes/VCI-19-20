@@ -302,6 +302,7 @@ def tracking_realtime_filtered():
 
         s = cv2.getTrackbarPos(switch, 'Original vs Filtered')
 
+        #creates the masks for the objects to detect
         #tracking_ball
         lower_hsv_ball = np.array([22, 77, 88])
         higher_hsv_ball = np.array([41, 254, 255])
@@ -319,29 +320,29 @@ def tracking_realtime_filtered():
         higher_hsv_lines = np.array([179, 49, 255])
         mask_lines = cv2.inRange(hsv, lower_hsv_lines, higher_hsv_lines)
         
-        if s==1:
+        if s==1:	#detect all objects
             mask  = mask_ball+mask_blue+mask_lines+mask_orange
             frame_filtered = cv2.bitwise_or(frame, frame, mask=mask)
             frame_filtered = cv2.cvtColor(frame_filtered, cv2.COLOR_BGR2GRAY)
             frame_filtered = opening(frame_filtered,1)
             frame_filtered = erosion(frame_filtered,1)
 
-        elif s==2:   
+        elif s==2:   #detect ball
             frame_filtered = cv2.bitwise_and(frame, frame, mask=mask_ball)
             frame_filtered = cv2.cvtColor(frame_filtered, cv2.COLOR_BGR2GRAY)        
             frame_filtered = opening(frame_filtered,1)
 
-        elif s==3:   
+        elif s==3:   #detect team blue
             frame_filtered = cv2.bitwise_and(frame, frame, mask=mask_blue)
             frame_filtered = cv2.cvtColor(frame_filtered, cv2.COLOR_BGR2GRAY)
             frame_filtered = opening(frame_filtered,1)
 
-        elif s==4:
+        elif s==4:	 #detect team orange
             frame_filtered = cv2.bitwise_and(frame, frame, mask=mask_orange)
             frame_filtered = cv2.cvtColor(frame_filtered, cv2.COLOR_BGR2GRAY)
             frame_filtered = opening(frame_filtered,1)
 
-        elif s==5:
+        elif s==5:	#detect white lines of the field
             frame_filtered = cv2.bitwise_and(frame, frame, mask=mask_lines)
             frame_filtered = cv2.cvtColor(frame_filtered, cv2.COLOR_BGR2GRAY)
             frame_filtered = closing(frame_filtered,1)
@@ -423,22 +424,22 @@ def simplest_thresholds():
         if s==1:
             mask = mask_ball+mask_blue+mask_lines+mask_orange
             frame = cv2.bitwise_or(frame, frame, mask=mask)
-        elif s==2:   
+        elif s==2:   #threshold inverted binary
             mask = mask_ball+mask_blue+mask_lines+mask_orange
             frame = cv2.bitwise_or(frame, frame, mask=mask)
             frame = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
             ret,frame = cv2.threshold(frame,127,255,cv2.THRESH_BINARY_INV)
-        elif s==3:   
+        elif s==3:   #Threshold truncate
              mask = mask_ball+mask_blue+mask_lines+mask_orange
              frame = cv2.bitwise_or(frame, frame, mask=mask)
              frame = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
              ret,frame = cv2.threshold(frame,127,255,cv2.THRESH_TRUNC)
-        elif s==4:
+        elif s==4:	#threshold to zero
              mask = mask_ball+mask_blue+mask_lines+mask_orange
              frame = cv2.bitwise_or(frame, frame, mask=mask)
              frame = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
              ret,frame = cv2.threshold(frame,127,255,cv2.THRESH_TOZERO)
-        elif s==5:
+        elif s==5:	#threshold to zero inverted
              mask = mask_ball+mask_blue+mask_lines+mask_orange
              frame = cv2.bitwise_or(frame, frame, mask=mask)
              frame = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)

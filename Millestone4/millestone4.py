@@ -35,7 +35,7 @@ def closing(frame,iter):
     frame=erosion(frame,iter)
     return frame
 
-def limit_area_to_field(frame):
+def limit_area_to_field(frame): #creates a mask to eliminate the area outside the field
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
         sensitivity = 15
         lower_hsv_field=np.array([60 - sensitivity, 100, 50])
